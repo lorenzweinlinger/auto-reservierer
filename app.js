@@ -44,6 +44,7 @@
     const ms = min * 60000;
     return new Date(Math.ceil(d.getTime() / ms) * ms);
   };
+  const nowMinute = () => { const d = new Date(); d.setSeconds(0, 0); return d; };
   const dayDiff = (d) => Math.round((startOfDay(d) - startOfDay(new Date())) / DAY_MS);
   const weekday = (d) => d.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "");
   const fmtTime = (d) => timeVal(d);
@@ -427,7 +428,7 @@
       f.note.value = edit.note || "";
       state.durMin = Math.round((edit.end - edit.start) / 60000);
     } else {
-      let start = roundUp(now);
+      let start = nowMinute();
       if (day && dayDiff(day) > 0) { start = new Date(day); start.setHours(8, 0, 0, 0); }
       state.durMin = 120;
       setStart(start);
@@ -604,7 +605,7 @@
   $("start-chips").addEventListener("click", (ev) => {
     const which = ev.target.dataset && ev.target.dataset.start;
     if (!which) return;
-    let s = roundUp(new Date(), 5);
+    let s = nowMinute();
     if (which === "tomorrow") { s = addDays(startOfDay(new Date()), 1); s.setHours(8, 0, 0, 0); }
     setStart(s);
     setEnd(addMin(s, state.durMin));
@@ -614,11 +615,11 @@
   $("dur-chips").addEventListener("click", (ev) => {
     const dur = ev.target.dataset && ev.target.dataset.dur;
     if (!dur) return;
-    let s = getStart() || roundUp(new Date());
+    let s = getStart() || nowMinute();
     if (dur === "day") {
       // From the start of the day (or now, if that's today) until the end of the day.
       const dayStart = startOfDay(s);
-      s = dayDiff(dayStart) === 0 ? roundUp(new Date(), 5) : dayStart;
+      s = dayDiff(dayStart) === 0 ? nowMinute() : dayStart;
       setStart(s);
       const e = new Date(dayStart); e.setHours(23, 59, 0, 0);
       setEnd(e);
