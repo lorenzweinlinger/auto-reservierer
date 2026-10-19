@@ -10,5 +10,6 @@ window.APP_CONFIG = {
   cars: [
     { id: "hyundai", name: "Hyundai", color: "#2f6fe0" },
     { id: "tesla", name: "Tesla", color: "#e0721f" },
+    { id: "kleiner-ford", name: "Kleiner Ford", color: "#8b5cf6" },
   ],
 };

@@ -269,6 +269,7 @@
 
   function renderCars() {
     const now = new Date();
+    $("cars").classList.toggle("many", CFG.cars.length > 2);
     $("cars").replaceChildren(...CFG.cars.map((car) => {
       const card = el("div", "car-card");
       card.style.setProperty("--car", car.color);
@@ -524,6 +525,7 @@
     const ignore = state.editing && state.editing.id;
     const valid = start && end && end > start;
 
+    $("car-pick").style.setProperty("--n", CFG.cars.length);
     $("car-pick").replaceChildren(...CFG.cars.map((car) => {
       const b = el("button", "car-opt" + (state.car === car.id ? " on" : ""));
       b.type = "button";

@@ -151,6 +151,18 @@ input:focus { border-color: var(--text); }
 
 /* Car status cards */
 .cars { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+/* With more than two cars: one compact row per car */
+.cars.many { grid-template-columns: 1fr; gap: 10px; }
+.cars.many .car-card {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 10px;
+}
+.cars.many .status { grid-column: 2; grid-row: 1; align-self: center; }
+.cars.many .car-detail, .cars.many .return-btn { grid-column: 1 / -1; }
+.cars.many .return-btn { margin-top: 6px; }
 .car-card {
   position: relative;
   text-align: left;
@@ -337,7 +349,8 @@ input:focus { border-color: var(--text); }
 
 .field { display: flex; flex-direction: column; gap: 8px; }
 .label { font-weight: 600; font-size: 15px; }
-.dt { display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px; }
+.dt { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 8px; }
+.dt input { min-width: 0; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip-btn {
   border: 1px solid var(--line);
@@ -349,7 +362,7 @@ input:focus { border-color: var(--text); }
 }
 .chip-btn.on { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 
-.car-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.car-pick { display: grid; grid-template-columns: repeat(var(--n, 2), 1fr); gap: 10px; }
 .car-opt {
   border: 2px solid var(--line);
   background: var(--surface);
@@ -361,7 +374,8 @@ input:focus { border-color: var(--text); }
   gap: 4px;
   min-height: 76px;
 }
-.car-opt .nm { font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.car-opt .nm { font-weight: 700; display: flex; align-items: flex-start; gap: 8px; line-height: 1.25; }
+.car-opt .nm .dot { margin-top: .3em; }
 .car-opt .av { font-size: 13px; font-weight: 600; }
 .car-opt .av.free { color: var(--free); }
 .car-opt .av.busy { color: var(--busy); }
@@ -399,6 +413,6 @@ input:focus { border-color: var(--text); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
 @media (max-width: 360px) {
-  .cars, .car-pick { grid-template-columns: 1fr; }
+  .cars, .car-pick { grid-template-columns: 1fr !important; }
   .car-card { min-height: 0; }
 }
