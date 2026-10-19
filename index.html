@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Auto-Reservierer</title>
+  <meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111317" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Autos">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Step 1: family code -->
+  <section id="screen-code" class="screen center" hidden>
+    <form id="code-form" class="card login">
+      <div class="logo" aria-hidden="true">🚗</div>
+      <h1>Auto-Reservierer</h1>
+      <p class="muted">Gib den Familien-Code ein. Du musst das nur einmal machen.</p>
+      <input id="code-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Familien-Code" required>
+      <p id="code-error" class="error" hidden></p>
+      <button class="btn-primary" type="submit">Weiter</button>
+      <p id="demo-hint" class="muted small" hidden>Demo-Modus: der Code ist <b>demo</b>.</p>
+    </form>
+  </section>
+
+  <!-- Step 2: who are you -->
+  <section id="screen-name" class="screen center" hidden>
+    <div class="card login">
+      <h1>Wer bist du?</h1>
+      <p class="muted">Tippe auf deinen Namen.</p>
+      <div id="name-list" class="name-list"></div>
+      <button id="logout-btn" class="btn-link small" type="button">Anderen Code eingeben</button>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main id="screen-main" class="screen" hidden>
+    <header class="topbar">
+      <h1>Autos</h1>
+      <button id="me-btn" class="chip" type="button" aria-label="Person wechseln"></button>
+    </header>
+
+    <p id="demo-banner" class="banner" hidden>Demo-Modus – Reservierungen werden nur auf diesem Gerät gespeichert.</p>
+    <p id="offline-banner" class="banner warn" hidden>Keine Verbindung – Anzeige ist evtl. nicht aktuell.</p>
+
+    <section id="cars" class="cars" aria-label="Status der Autos"></section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Nächste 7 Tage</h2>
+        <div id="legend" class="legend"></div>
+      </div>
+      <div id="week" class="week"></div>
+    </section>
+
+    <section class="block">
+      <h2>Reservierungen</h2>
+      <div id="list" class="list"><p class="muted">Lade …</p></div>
+    </section>
+  </main>
+
+  <button id="fab" class="fab" type="button" hidden>
+    <span aria-hidden="true">＋</span> Reservieren
+  </button>
+
+  <!-- Reserve / edit sheet -->
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-backdrop" data-close></div>
+    <form id="res-form" class="sheet-panel" novalidate role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <div class="grabber" aria-hidden="true"></div>
+      <h2 id="sheet-title">Auto reservieren</h2>
+
+      <div class="field">
+        <span class="label">Welches Auto?</span>
+        <div id="car-pick" class="car-pick"></div>
+      </div>
+
+      <div class="field">
+        <span class="label">Von</span>
+        <div class="dt">
+          <input id="f-start-date" type="date" required aria-label="Startdatum">
+          <input id="f-start-time" type="time" step="300" required aria-label="Startzeit">
+        </div>
+        <div class="chips" id="start-chips">
+          <button type="button" class="chip-btn" data-start="now">Jetzt</button>
+          <button type="button" class="chip-btn" data-start="tomorrow">Morgen 8:00</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="label">Bis</span>
+        <div class="dt">
+          <input id="f-end-date" type="date" required aria-label="Enddatum">
+          <input id="f-end-time" type="time" step="300" required aria-label="Endzeit">
+        </div>
+        <div class="chips" id="dur-chips">
+          <button type="button" class="chip-btn" data-dur="60">1 Std</button>
+          <button type="button" class="chip-btn" data-dur="120">2 Std</button>
+          <button type="button" class="chip-btn" data-dur="240">4 Std</button>
+          <button type="button" class="chip-btn" data-dur="day">Ganzer Tag</button>
+        </div>
+      </div>
+
+      <label class="field">
+        <span class="label">Notiz <span class="muted">(optional)</span></span>
+        <input id="f-note" type="text" maxlength="80" placeholder="z. B. Einkaufen, Training">
+      </label>
+
+      <p id="form-msg" class="conflict" hidden></p>
+
+      <button id="f-submit" type="submit" class="btn-primary">Reservieren</button>
+      <div class="sheet-actions">
+        <button id="f-delete" type="button" class="btn-link danger" hidden>Reservierung löschen</button>
+        <button type="button" class="btn-link" data-close>Abbrechen</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
