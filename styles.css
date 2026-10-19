@@ -329,6 +329,7 @@ input:focus { border-color: var(--text); }
   flex-direction: column;
   gap: 16px;
   animation: up .22s ease-out;
+  overscroll-behavior: contain;
 }
 .grabber { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 4px auto 0; }
 @keyframes up { from { transform: translateY(40px); opacity: 0; } }

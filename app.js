@@ -439,16 +439,84 @@
     }
     $("sheet-title").textContent = edit ? "Reservierung ändern" : "Auto reservieren";
     $("f-delete").hidden = !edit;
+    clearTimeout(slideTimer);
+    resetSheetStyles();
     $("sheet").hidden = false;
     document.body.style.overflow = "hidden";
     updateSheet();
   }
 
   function closeSheet() {
+    clearTimeout(slideTimer);
+    resetSheetStyles();
     $("sheet").hidden = true;
     document.body.style.overflow = "";
     state.editing = null;
   }
+
+  // ---------- sheet: slide out / swipe down to close ----------
+  const panel = $("res-form");
+  const backdrop = document.querySelector(".sheet-backdrop");
+  let slideTimer;
+
+  function resetSheetStyles() {
+    panel.style.transition = panel.style.transform = "";
+    backdrop.style.transition = backdrop.style.opacity = "";
+  }
+
+  function slideSheetClosed() {
+    if ($("sheet").hidden) return;
+    panel.style.transition = "transform .2s ease-in";
+    backdrop.style.transition = "opacity .2s";
+    panel.style.transform = "translateY(100%)";
+    backdrop.style.opacity = "0";
+    clearTimeout(slideTimer);
+    slideTimer = setTimeout(closeSheet, 200);
+  }
+
+  let touchY = 0, touchT = 0, dragY = 0, tracking = false, dragging = false;
+  panel.addEventListener("touchstart", (ev) => {
+    // Only start a swipe when the sheet is scrolled to the top, so scrolling its content still works.
+    tracking = ev.touches.length === 1 && panel.scrollTop <= 0;
+    dragging = false;
+    dragY = 0;
+    touchY = ev.touches[0].clientY;
+    touchT = ev.timeStamp;
+  }, { passive: true });
+
+  panel.addEventListener("touchmove", (ev) => {
+    if (!tracking) return;
+    dragY = ev.touches[0].clientY - touchY;
+    if (!dragging) {
+      if (dragY < 0) { tracking = false; return; } // swiping up = normal scrolling
+      if (dragY < 10) return;                     // ignore taps and tiny wobbles
+      dragging = true;
+      panel.style.transition = "none";
+      backdrop.style.transition = "none";
+    }
+    ev.preventDefault();
+    const y = Math.max(0, dragY - 10);
+    panel.style.transform = `translateY(${y}px)`;
+    backdrop.style.opacity = String(Math.max(0, 1 - y / panel.offsetHeight));
+  }, { passive: false });
+
+  function endSwipe(ev) {
+    if (!tracking) return;
+    tracking = false;
+    if (!dragging) return;
+    dragging = false;
+    const speed = dragY / Math.max(1, ev.timeStamp - touchT); // px per ms
+    if (ev.type === "touchend" && (dragY > panel.offsetHeight * 0.25 || speed > 0.5)) {
+      slideSheetClosed();
+    } else {
+      panel.style.transition = "transform .2s ease-out";
+      backdrop.style.transition = "opacity .2s";
+      panel.style.transform = "";
+      backdrop.style.opacity = "";
+    }
+  }
+  panel.addEventListener("touchend", endSwipe);
+  panel.addEventListener("touchcancel", endSwipe);
 
   // Re-evaluates availability, conflict message and button state for the current form values.
   function updateSheet() {
@@ -587,8 +655,8 @@
   $("fab").onclick = () => openSheet();
   $("res-form").addEventListener("submit", submitSheet);
   $("f-delete").onclick = deleteEditing;
-  for (const c of document.querySelectorAll("[data-close]")) c.onclick = closeSheet;
-  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !$("sheet").hidden) closeSheet(); });
+  for (const c of document.querySelectorAll("[data-close]")) c.onclick = slideSheetClosed;
+  document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") slideSheetClosed(); });
 
   // Changing the start keeps the duration; changing the end changes the duration.
   for (const inp of [f.sd, f.st]) inp.addEventListener("change", () => {
